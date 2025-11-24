@@ -1,63 +1,153 @@
-import Image from "next/image";
+import { RichTextEditor } from "@/components/rich-text-editor";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
+import { GraduationCap, NotebookPen, Settings2 } from "lucide-react";
+
+type NavItem = {
+  id: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+};
+
+const navigation: readonly NavItem[] = [
+  {
+    id: "notes",
+    label: "Notes",
+    description: "Organize topics and snippets in folders.",
+    icon: NotebookPen,
+  },
+  {
+    id: "quiz",
+    label: "Quiz",
+    description: "Track spaced-repetition sessions at a glance.",
+    icon: GraduationCap,
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    description: "Manage preferences and connected devices.",
+    icon: Settings2,
+  },
+] as const;
+
+const activeItem = navigation[0];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex min-h-screen flex-col bg-muted/40 md:flex-row">
+      <aside className="w-full border-b bg-background md:sticky md:top-0 md:flex md:h-screen md:w-[250px] md:flex-col md:border-b-0 md:border-r">
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 shrink-0 place-content-center rounded-lg bg-primary text-lg font-semibold text-primary-foreground">
+              M
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">
+                Memoloop
+              </p>
+              <p className="text-lg font-semibold text-foreground">Dashboard</p>
+            </div>
+          </div>
+
+          <nav aria-label="Main" className="space-y-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.id === activeItem.id;
+
+              return (
+                <Button
+                  key={item.id}
+                  type="button"
+                  variant="ghost"
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "w-full justify-start gap-3 rounded-lg px-3 py-5 text-base transition",
+                    isActive
+                      ? "bg-primary/10 text-primary shadow-sm hover:bg-primary/15"
+                      : "text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  <Icon className="h-5 w-5" aria-hidden />
+                  {item.label}
+                </Button>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">Focus tip</p>
+            <p>Batch your note reviews into 25-minute loops.</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </aside>
+
+      <main className="flex-1">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-6">
+          <header>
+            <p className="text-sm text-muted-foreground">Overview</p>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Daily learning snapshot
+            </h1>
+          </header>
+
+          <section className="grid gap-4 md:grid-cols-2">
+            {navigation.map((item) => (
+              <article
+                key={`card-${item.id}`}
+                className="rounded-2xl border bg-background p-5 shadow-sm transition hover:shadow-md"
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="h-5 w-5 text-muted-foreground" />
+                  <h2 className="text-lg font-semibold">{item.label}</h2>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {item.description}
+                </p>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Updated 2h ago</span>
+                  <Button variant="link" className="h-auto p-0 text-primary">
+                    View details
+                  </Button>
+                </div>
+              </article>
+            ))}
+          </section>
+
+          <section className="rounded-2xl border bg-background p-5 shadow-sm">
+            <h2 className="text-lg font-semibold">Upcoming loops</h2>
+            <div className="mt-4 grid gap-3 text-sm">
+              {["Biology chapters", "Design patterns", "Interview prep"].map(
+                (loop) => (
+                  <div
+                    key={loop}
+                    className="flex items-center justify-between rounded-lg bg-muted/60 px-4 py-3"
+                  >
+                    <span className="font-medium">{loop}</span>
+                    <span className="text-muted-foreground">Due today</span>
+                  </div>
+                )
+              )}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border bg-background p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">Loop 笔记</h2>
+                <p className="text-sm text-muted-foreground">
+                  浮动工具栏会在光标附近出现
+                </p>
+              </div>
+              <span className="hidden text-xs text-muted-foreground md:inline">
+                支持加粗 / 斜体 / H1-H3
+              </span>
+            </div>
+            <div className="mt-4">
+              <RichTextEditor />
+            </div>
+          </section>
         </div>
       </main>
     </div>
