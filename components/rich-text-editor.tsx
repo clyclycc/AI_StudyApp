@@ -6,10 +6,11 @@ import StarterKit from '@tiptap/starter-kit'
 import Heading from '@tiptap/extension-heading'
 import Bold from '@tiptap/extension-bold'
 import Italic from '@tiptap/extension-italic'
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, startTransition } from 'react'
 import { saveNote } from '@/actions/notes' 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+
 
 const initialState = {
   message: null,
@@ -35,14 +36,17 @@ export default function RichTextEditor() {
         class: 'min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
       },
     },
+    immediatelyRender: false, // 之前加的，保持不动
   })
 
   useEffect(() => {
     if (state.success) {
+      // 如果你装了 sonner 就用 toast，没装就用 alert
+      // toast.success(state.message || '保存成功！');
       alert(state.message || '保存成功！');
       editor?.commands.clearContent();
-      // Reset title if you have a way to do that
     } else if (state.message) {
+      // toast.error(state.message);
       alert(state.message);
     }
   }, [state, editor]);
@@ -55,7 +59,10 @@ export default function RichTextEditor() {
     const formData = new FormData(event.currentTarget);
     formData.set('content', editor.getHTML());
     
-    formAction(formData);
+    // 2. 修复核心错误：包裹在 startTransition 中
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   return (
@@ -64,10 +71,11 @@ export default function RichTextEditor() {
         <Input 
           name="title"
           placeholder="请输入笔记标题..."
-          disabled={false} // You might want to manage pending state here
+          // 可以选择在 pending 时禁用
+          // disabled={isPending} 
           className="font-medium"
         />
-        <Button type="submit" disabled={false}>
+        <Button type="submit">
           {'保存笔记'}
         </Button>
       </div>

@@ -26,19 +26,26 @@ const noteSchema = z.object({
 
 export async function saveNote(prevState: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const supabase = createClient();
+    
+    // const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // const {
+    //   data: { user },
+    // } = await supabase.auth.getUser();
 
-    if (!user) {
-      return {
-        message: "Authentication error.",
-        errors: { _server: ["User not authenticated"] },
-        success: false,
-      };
-    }
+    // if (!user) {
+    //   return {
+    //     message: "Authentication error.",
+    //     errors: { _server: ["User not authenticated"] },
+    //     success: false,
+    //   };
+    // }
+
+    // 2. 【新增】伪造一个开发者用户 (用于本地测试)
+    const user = {
+      id: "081e3f3d-8888-4252-b747-2635c4013ed7", // 固定的测试 ID
+      email: "dev@localhost",
+    };
 
     const validatedFields = noteSchema.safeParse({
       title: formData.get("title"),

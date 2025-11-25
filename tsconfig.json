@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",  // <--- 添加这一行
     "incremental": true,
     "plugins": [
       {
