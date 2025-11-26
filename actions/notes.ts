@@ -4,6 +4,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase-server";
+import { generateEmbedding } from "@/lib/embeddings";
 
 // The state from useActionState
 type ActionState = {
@@ -71,13 +72,35 @@ export async function saveNote(prevState: ActionState, formData: FormData): Prom
         },
     });
 
-    await prisma.note.create({
+    // Generate embedding for the note content
+    let embedding: number[] | null = null;
+    try {
+      embedding = await generateEmbedding(validatedFields.data.content);
+    } catch (error) {
+      console.error("Failed to generate embedding:", error);
+      // Continue without embedding if generation fails
+    }
+
+    const note = await prisma.note.create({
       data: {
         title: validatedFields.data.title,
         content: validatedFields.data.content,
         authorId: user.id, // Associate note with the user
       },
     });
+
+    // Update embedding using raw SQL if available
+    if (embedding) {
+      try {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "Note" SET embedding = $1::vector WHERE id = $2`,
+          JSON.stringify(embedding),
+          note.id
+        );
+      } catch (error) {
+        console.error("Failed to update embedding:", error);
+      }
+    }
 
     revalidatePath("/"); // Revalidate the page to show the new note
     return { message: "Note saved successfully.", success: true, errors: {} };

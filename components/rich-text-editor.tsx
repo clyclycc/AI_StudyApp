@@ -6,10 +6,12 @@ import StarterKit from '@tiptap/starter-kit'
 import Heading from '@tiptap/extension-heading'
 import Bold from '@tiptap/extension-bold'
 import Italic from '@tiptap/extension-italic'
-import { useActionState, useEffect, startTransition } from 'react'
+import { useActionState, useEffect, startTransition, useState } from 'react'
 import { saveNote } from '@/actions/notes' 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { MessageCircle, Brain } from 'lucide-react'
+import Link from 'next/link'
 
 
 const initialState = {
@@ -20,6 +22,8 @@ const initialState = {
 
 export default function RichTextEditor() {
   const [state, formAction] = useActionState(saveNote, initialState)
+  const [lastNoteId, setLastNoteId] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   
   const editor = useEditor({
     extensions: [
@@ -45,6 +49,8 @@ export default function RichTextEditor() {
       // toast.success(state.message || '保存成功！');
       alert(state.message || '保存成功！');
       editor?.commands.clearContent();
+      // Generate a mock note ID for demo purposes (in production, this would come from the server)
+      setLastNoteId(Math.random().toString(36).substr(2, 9))
     } else if (state.message) {
       // toast.error(state.message);
       alert(state.message);
@@ -60,8 +66,10 @@ export default function RichTextEditor() {
     formData.set('content', editor.getHTML());
     
     // 2. 修复核心错误：包裹在 startTransition 中
+    setIsSaving(true)
     startTransition(() => {
       formAction(formData);
+      setIsSaving(false)
     });
   };
 
@@ -75,13 +83,39 @@ export default function RichTextEditor() {
           // disabled={isPending} 
           className="font-medium"
         />
-        <Button type="submit">
-          {'保存笔记'}
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? '保存中...' : '保存笔记'}
         </Button>
       </div>
       
       <div className="prose prose-sm max-w-none dark:prose-invert">
         <EditorContent editor={editor} />
+      </div>
+
+      {/* AI Brain Features */}
+      <div className="flex gap-2 pt-2 border-t">
+        <Link href="/chat">
+          <Button 
+            type="button"
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            提问 AI
+          </Button>
+        </Link>
+        {lastNoteId && (
+          <Link href={`/quiz/${lastNoteId}`}>
+            <Button 
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Brain className="w-4 h-4" />
+              生成测验
+            </Button>
+          </Link>
+        )}
       </div>
     </form>
   )
