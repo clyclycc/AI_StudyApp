@@ -2,7 +2,8 @@ import  RichTextEditor  from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import { GraduationCap, NotebookPen, Settings2 } from "lucide-react";
+import { GraduationCap, NotebookPen, Settings2, MessageCircle, BookOpen } from "lucide-react";
+import Link from "next/link";
 
 type NavItem = {
   id: string;
@@ -75,6 +76,31 @@ export default function Home() {
               );
             })}
           </nav>
+
+          {/* AI Features Navigation */}
+          <div className="border-t pt-4 space-y-1">
+            <p className="px-3 text-xs font-semibold uppercase text-muted-foreground">AI Features</p>
+            <Link href="/chat" className="block">
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full justify-start gap-3 rounded-lg px-3 py-5 text-base transition text-muted-foreground hover:bg-muted"
+              >
+                <MessageCircle className="h-5 w-5" aria-hidden />
+                提问 AI
+              </Button>
+            </Link>
+            <Link href="/notes" className="block">
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full justify-start gap-3 rounded-lg px-3 py-5 text-base transition text-muted-foreground hover:bg-muted"
+              >
+                <BookOpen className="h-5 w-5" aria-hidden />
+                我的笔记
+              </Button>
+            </Link>
+          </div>
 
           <div className="mt-auto rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">Focus tip</p>

@@ -41,7 +41,7 @@ ${noteContent}
 请确保生成的问题内容与笔记相关，难度适中。`;
 
     const { text } = await generateText({
-      model: google('gemini-1.5-flash-002'),
+      model: google('gemini-2.0-flash'),
       prompt,
       temperature: 0.7,
     });

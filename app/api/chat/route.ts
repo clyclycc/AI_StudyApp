@@ -44,9 +44,9 @@ ${context || '（暂无相关笔记）'}
 
 请根据这些笔记内容回答用户的问题。如果笔记中没有相关信息，请说明这一点。`;
 
-    // Step 3: 使用 Gemini 1.5 Flash 002 生成流式响应
+    // Step 3: 使用 Gemini 2.0 Flash 生成流式响应
     const result = streamText({
-      model: google('gemini-1.5-flash-002'),
+      model: google('gemini-2.0-flash'),
       system: systemPrompt,
       messages: [
         {
